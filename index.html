@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LandChain - Decentralized Land Verification</title>
+    <meta name="description" content="Secure property ownership through blockchain technology. Upload land documents to IPFS and store verification hashes on Ethereum blockchain for tamper-proof authenticity.">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Web3.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    
+    <!-- IPFS HTTP Client -->
+    <script src="https://cdn.jsdelivr.net/npm/ipfs-http-client@60.0.1/dist/index.min.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>LandChain</h1>
+                        <p>Decentralized Land Verification</p>
+                    </div>
+                </div>
+                
+                <div class="wallet-section">
+                    <div class="network-status">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="networkName">Not Connected</span>
+                    </div>
+                    <button id="connectWallet" class="btn btn-primary">
+                        <i class="fas fa-wallet"></i>
+                        <span id="walletText">Connect Wallet</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Status Banner -->
+            <div class="status-banner">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <h3>Secure Document Verification System</h3>
+                    <p>Upload land documents to IPFS and store verification hashes on Ethereum blockchain for tamper-proof authenticity.</p>
+                </div>
+            </div>
+
+            <div class="grid">
+                <!-- Left Column: Document Upload -->
+                <div class="grid-left">
+                    <!-- Document Upload Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon upload-icon">
+                                    <i class="fas fa-upload"></i>
+                                </div>
+                                <div>
+                                    <h3>Upload Land Document</h3>
+                                    <p>Supports PDF, JPG, PNG formats</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="upload-zone" id="uploadZone">
+                                <i class="fas fa-cloud-upload-alt upload-zone-icon"></i>
+                                <h3>Drop your document here</h3>
+                                <p>or click to browse files</p>
+                                <button type="button" class="btn btn-outline">Browse Files</button>
+                                <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                            </div>
+
+                            <div class="selected-file" id="selectedFile" style="display: none;">
+                                <div class="file-info">
+                                    <i class="fas fa-file-alt file-icon"></i>
+                                    <div class="file-details">
+                                        <p class="file-name" id="fileName"></p>
+                                        <p class="file-size" id="fileSize"></p>
+                                    </div>
+                                    <button class="btn btn-ghost remove-file" id="removeFile">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button id="uploadBtn" class="btn btn-success btn-full" disabled>
+                                <i class="fas fa-shield-alt"></i>
+                                <span id="uploadBtnText">Upload to IPFS & Store Hash</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Status Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon status-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h3>Transaction Status</h3>
+                                    <p>Real-time blockchain updates</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="transaction-steps" id="transactionSteps">
+                                <div class="step">
+                                    <div class="step-icon waiting">1</div>
+                                    <div class="step-content">
+                                        <p class="step-title">Upload to IPFS</p>
+                                        <p class="step-description">Document will be stored on IPFS</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-icon waiting">2</div>
+                                    <div class="step-content">
+                                        <p class="step-title">Store hash on blockchain</p>
+                                        <p class="step-description">Hash will be recorded on Ethereum</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-icon waiting">3</div>
+                                    <div class="step-content">
+                                        <p class="step-title">Transaction confirmed</p>
+                                        <p class="step-description">Blockchain confirmation received</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Verification & Receipt -->
+                <div class="grid-right">
+                    <!-- Document Receipt Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon receipt-icon">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                                <div>
+                                    <h3>Document Receipt</h3>
+                                    <p>Blockchain verification details</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content" id="receiptContent">
+                            <div class="no-document">
+                                <i class="fas fa-file-upload no-document-icon"></i>
+                                <p>No document uploaded yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Verification Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon verification-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div>
+                                    <h3>Verify Document</h3>
+                                    <p>Check authenticity by IPFS hash</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="input-group">
+                                <label for="ipfsHash">Enter IPFS Hash</label>
+                                <div class="input-row">
+                                    <input type="text" id="ipfsHash" placeholder="QmXp2q3B7N8x5Y9Z1A2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7" class="input-mono">
+                                    <button id="verifyBtn" class="btn btn-primary">
+                                        <span id="verifyBtnText">Verify</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="verification-result" id="verificationResult" style="display: none;">
+                                <!-- Verification results will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Documents Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon history-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div>
+                                    <h3>Recent Documents</h3>
+                                    <p>Your uploaded documents</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content" id="recentDocuments">
+                            <div class="no-wallet">
+                                <i class="fas fa-wallet no-wallet-icon"></i>
+                                <p>Connect your wallet to view documents</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Features Section -->
+            <div class="security-section">
+                <div class="security-header">
+                    <h2>Why LandChain is Secure</h2>
+                    <p>Our decentralized architecture ensures tamper-proof document verification and transparent property transactions.</p>
+                </div>
+
+                <div class="security-features">
+                    <div class="feature">
+                        <div class="feature-icon tamper-proof">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3>Tamper-Proof Storage</h3>
+                        <p>Documents stored on IPFS with cryptographic hashes secured on Ethereum blockchain, making forgery impossible.</p>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon public-verification">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3>Public Verification</h3>
+                        <p>Anyone can verify document authenticity using IPFS hashes, ensuring transparency in property transactions.</p>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon decentralized">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h3>Decentralized Network</h3>
+                        <p>No central authority controls the system. Documents and proofs exist permanently across the distributed network.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <h3>LandChain</h3>
+                            <p>Decentralized Land Verification</p>
+                        </div>
+                    </div>
+                    <p class="footer-description">
+                        Securing property ownership through blockchain technology. Transparent, tamper-proof, 
+                        and decentralized document verification for the future of real estate.
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="#">Documentation</a></li>
+                            <li><a href="#">API Reference</a></li>
+                            <li><a href="#">Smart Contracts</a></li>
+                            <li><a href="#">IPFS Guide</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Status Page</a></li>
+                            <li><a href="#">Bug Reports</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2023 LandChain. All rights reserved.</p>
+                <div class="legal-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
